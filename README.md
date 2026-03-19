@@ -18,7 +18,7 @@ This deployment was tested on a cloud-based environment to handle multiple Nokia
 ## 🏗️ 3. Network Architecture & Topology
 The setup uses a standard 2-Spine / 2-Leaf architecture.
 
-![Topology Design](images/topology-design.png)
+![Topology Design](Topology/topology-design.png)
 *(Note: Ensure your topology image highlights the OSPF Underlay, iBGP EVPN Overlay, and LACP/ESI links).*
 
 ### 📊 IP & BGP Allocation Matrix
