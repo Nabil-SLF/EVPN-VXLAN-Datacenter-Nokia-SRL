@@ -19,7 +19,6 @@ This deployment was tested on a cloud-based environment to handle multiple Nokia
 The setup uses a standard 2-Spine / 2-Leaf architecture.
 
 ![Topology Design](Topology/topology-design.png)
-*(Note: Ensure your topology image highlights the OSPF Underlay, iBGP EVPN Overlay, and LACP/ESI links).*
 
 ### 📊 IP & BGP Allocation Matrix
 All nodes operate within the same Autonomous System (**AS 65001**) to form an iBGP EVPN Overlay.
@@ -47,7 +46,7 @@ Data forwarding over the IP core is encapsulated in **VXLAN** tunnels.
 
 ## 🔗 7. All-Active Multihoming (EVPN ESI)
 Servers are connected to both leafs using **LACP (802.3ad) port-channels**. 
-By configuring an Ethernet Segment Identifier (ESI, e.g., `00:00:00:00:00:11`) and `bgp-instance 1`, both `leaf1` and `leaf2` operate in an **Active-Active** state for the same server. This allows load balancing and eliminates single points of failure.
+By configuring an Ethernet Segment Identifier (ESI, `00:00:00:00:00:11`) and `bgp-instance 1`, both `leaf1` and `leaf2` operate in an **Active-Active** state for the same server. This allows load balancing and eliminates single points of failure.
 
 ## ✅ 8. Verification & Failover Testing
 ### Sub-second Failover (0% Packet Loss)
