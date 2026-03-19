@@ -48,16 +48,10 @@ Data forwarding over the IP core is encapsulated in **VXLAN** tunnels.
 Servers are connected to both leafs using **LACP (802.3ad) port-channels**. 
 By configuring an Ethernet Segment Identifier (ESI, `00:00:00:00:00:11`) and `bgp-instance 1`, both `leaf1` and `leaf2` operate in an **Active-Active** state for the same server. This allows load balancing and eliminates single points of failure.
 
-## ✅ 8. Verification & Failover Testing
-### Sub-second Failover (0% Packet Loss)
-A continuous ping was initiated between end hosts. When one of the physical uplinks inside the LACP Bond was administratively disabled (`ip link set eth1 down`), the traffic instantly shifted to the remaining active link with **0% packet loss**.
+## ✅ 8. Complete Verification & Testing Guide
+To maintain readability, the complete end-to-end testing procedure—including control plane verification (OSPF, iBGP, EVPN), dataplane validation (MAC/ARP tables, VXLAN tunnels), and the **0% packet loss failover test**—has been detailed in a separate document.
 
-![Failover Test](images/failover-test.png)
-
-### Control Plane Verification
-BGP sessions, EVPN routes, and ARP synchronization (via EVPN Type 2 routes) were successfully verified on the Nokia SRL CLI.
-
-![CLI Verification](images/vrf-status.png)
+👉 **[Click here to view the comprehensive Verification & Testing Guide](VERIFICATION.md)**
 
 ## 🚀 9. How to Run This Lab (From Scratch)
 
