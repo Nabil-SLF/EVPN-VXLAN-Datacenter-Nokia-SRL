@@ -115,17 +115,15 @@ Both leafs successfully resolve the ARP entries for hosts via the `irb1` subinte
 Checking the status of the Ethernet Segment Identifiers (ESI) and the aggregated links toward the dual-homed servers.
 ```bash
 # On leaf1
-show interface lag1 detail
-show system network-instance protocols evpn ethernet-segments
+show system network-instance ethernet-segments detail
 
 # On leaf2
-show interface lag1 detail
-show system network-instance protocols evpn ethernet-segments
+show system network-instance ethernet-segments detail
 ```
 ![ESI LACP Leaf1](TestImgs/esi-lacp-leaf1.png)
 ![ESI LACP Leaf2](TestImgs/esi-lacp-leaf2.png)
 
-The ESI `00:00:00:00:00:11` is operational in `all-active` mode. The LACP port-channels (`lag1`) are in a forwarding state (`distributing`), ensuring active-active load balancing without STP.
+All Ethernet Segments (`ES-SRV1` to `ES-SRV4`) and their respective LACP port-channels (`lag1`-`lag4`) are operational in `all-active` mode. This ensures loop-free, active-active load balancing for all dual-homed servers without relying on STP.
 
 ---
 
@@ -133,18 +131,19 @@ The ESI `00:00:00:00:00:11` is operational in `all-active` mode. The LACP port-c
 The final validation focuses on end-to-end dataplane reachability and High Availability.
 
 ### 9. Intra-VLAN & Inter-VLAN Reachability
-Testing L2 bridging (same subnet) and L3 routing (different subnets).
+Testing local L2 bridging (same subnet) and local L3 routing (different subnets) across the multihomed servers.
+
 ```bash
-# Intra-VLAN: srv1 (VLAN 10) to srv3 (VLAN 10)
+# 1. Intra-VLAN: srv1 (VLAN 10) to srv3 (VLAN 10)
 docker exec -it clab-pro-evpn-srv1 ping -c 4 192.168.10.3
 
-# Inter-VLAN: srv1 (VLAN 10) to srv4 (VLAN 20)
+# 2. Inter-VLAN: srv1 (VLAN 10) to srv4 (VLAN 20)
 docker exec -it clab-pro-evpn-srv1 ping -c 4 192.168.20.4
 ```
 ![Intra VLAN Ping](TestImgs/intra-vlan-ping.png)
 ![Inter VLAN Ping](TestImgs/inter-vlan-ping.png)
 
-End hosts communicate seamlessly across the fabric. Intra-VLAN traffic is bridged across the VXLAN tunnel, while Inter-VLAN traffic is successfully routed at the ingress leaf using `ip-vrf-1`.
+All Ethernet Segments (`ES-SRV1` to `ES-SRV4`) and their respective LACP port-channels (`lag1` to `lag4`) are operational in `all-active` mode. This ensures loop-free, active-active load balancing for all dual-homed servers without relying on STP.
 
 ### 10. Sub-second Failover Test (0% Packet Loss)
 Simulating a physical link failure on a dual-homed server to validate the ESI failover mechanism.
@@ -156,6 +155,5 @@ docker exec -it clab-pro-evpn-srv1 ping 192.168.20.4
 docker exec -it clab-pro-evpn-srv1 ip link set eth1 down
 ```
 ![Failover Test Srv1](TestImgs/failover-test-srv1.png)
-![Failover Recovery](TestImgs/failover-recovery.png)
 
 Despite the deliberate link failure (`eth1`), the continuous ping shows **0% packet loss**. The EVPN multihoming control plane instantly redirected the traffic flow to the remaining active link (`eth2`), demonstrating true carrier-grade High Availability.
