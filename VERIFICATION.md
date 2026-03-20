@@ -60,10 +60,11 @@ Next, we validate the encapsulation, tenancy, routing tables, and multihoming co
 Verifying the operational state of the VXLAN interfaces and the configured Virtual Network Identifiers (VNIs).
 ```bash
 # On leaf1
-show tunnel-interface vxlan1
-
+show tunnel-interface vxlan0 vxlan-interface 10 brief
+show tunnel-interface vxlan0 vxlan-interface 20 brief
 # On leaf2
-show tunnel-interface vxlan1
+show tunnel-interface vxlan0 vxlan-interface 10 brief
+show tunnel-interface vxlan0 vxlan-interface 20 brief
 ```
 ![VXLAN Tunnel Leaf1](TestImgs/vxlan-tunnel-leaf1.png)
 ![VXLAN Tunnel Leaf2](TestImgs/vxlan-tunnel-leaf2.png)
@@ -74,10 +75,9 @@ Both leaf nodes show the `vxlan1` tunnel interface in an operational `up` state,
 Verifying that EVPN MAC/IP routes are correctly advertised and installed in the local MAC tables.
 ```bash
 # On leaf1
-show network-instance vlan10 bridge-table mac-table
-
+show network-instance vlan10 bridge-table mac-table all
 # On leaf2
-show network-instance vlan10 bridge-table mac-table
+show network-instance vlan10 bridge-table mac-table all
 ```
 ![EVPN MAC Leaf1](TestImgs/evpn-mac-leaf1.png)
 ![EVPN MAC Leaf2](TestImgs/evpn-mac-leaf2.png)
@@ -88,10 +88,9 @@ Both leafs dynamically learned the remote endpoints via EVPN `vxlan1` interfaces
 Validating the L3 routing tables for the tenant VRF to ensure Inter-VLAN routing is possible.
 ```bash
 # On leaf1
-show network-instance ip-vrf-1 route-table ipv4
-
+show network-instance ip-vrf-1 route-table ipv4-unicast summary
 # On leaf2
-show network-instance ip-vrf-1 route-table ipv4
+show network-instance ip-vrf-1 route-table ipv4-unicast summary
 ```
 ![IP VRF Leaf1](TestImgs/ip-vrf-leaf1.png)
 ![IP VRF Leaf2](TestImgs/ip-vrf-leaf2.png)
