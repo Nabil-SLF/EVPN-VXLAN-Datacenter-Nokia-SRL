@@ -14,6 +14,7 @@ This deployment was tested on a cloud-based environment to handle multiple Nokia
 * **Container Runtime:** Docker (Version 27.5.1)
 * **Orchestration Tool:** Containerlab (Version 0.64.0)
 * **Network OS (NOS):** Nokia SR Linux (`ghcr.io/nokia/srlinux`)
+
 ![Azure Cloud](configs/azure-VM.png)
 
 ## 3. Network Architecture & Topology
