@@ -4,7 +4,7 @@ This document outlines the step-by-step verification process to ensure the **Nok
 
 ---
 
-## 🟢 Phase 1: Core Layer & Underlay Verification
+## Phase 1: Core Layer & Underlay Verification
 We begin by verifying the robust foundation of the fabric: the OSPF underlay and the iBGP control plane.
 
 ### 1. OSPF Adjacencies (Spines)
@@ -53,7 +53,7 @@ The BGP sessions for the EVPN address family are successfully `established`. Bot
 
 ---
 
-## 🔵 Phase 2: Edge Layer & Overlay Verification (Leafs)
+## Phase 2: Edge Layer & Overlay Verification (Leafs)
 Next, we validate the encapsulation, tenancy, routing tables, and multihoming configurations on the VTEPs.
 
 ### 4. VXLAN Dataplane & Tunnel Status
@@ -127,7 +127,7 @@ All Ethernet Segments (`ES-SRV1` to `ES-SRV4`) and their respective LACP port-ch
 
 ---
 
-## 🔴 Phase 3: Application Layer & Failover (Servers)
+## Phase 3: Application Layer & Failover (Servers)
 The final validation focuses on end-to-end dataplane reachability and High Availability.
 
 ### 9. Intra-VLAN & Inter-VLAN Reachability
