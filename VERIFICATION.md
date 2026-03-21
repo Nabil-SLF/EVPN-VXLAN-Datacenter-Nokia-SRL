@@ -58,31 +58,37 @@ Next, we validate the encapsulation, tenancy, routing tables, and multihoming co
 
 ### 4. VXLAN Dataplane & Tunnel Status
 Verifying the operational state of the VXLAN interfaces and the configured Virtual Network Identifiers (VNIs).
+
 ```bash
 # On leaf1
 show tunnel-interface vxlan0 vxlan-interface 10 brief
 show tunnel-interface vxlan0 vxlan-interface 20 brief
+
 # On leaf2
 show tunnel-interface vxlan0 vxlan-interface 10 brief
 show tunnel-interface vxlan0 vxlan-interface 20 brief
 ```
+
 ![VXLAN Tunnel Leaf1](TestImgs/vxlan-tunnel-leaf1.png)
 ![VXLAN Tunnel Leaf2](TestImgs/vxlan-tunnel-leaf2.png)
 
-Both leaf nodes show the `vxlan1` tunnel interface in an operational `up` state, confirming the proper instantiation of Layer 2 (VNI 10, 20) and Layer 3 (VNI 1000) segments.
+Both leaf nodes show the `vxlan0` tunnel interfaces in an operational `up` state, confirming the proper instantiation of Layer 2 segments (VNI 10 and 20), ready to handle BUM traffic and EVPN multihoming synchronization.
 
-### 5. L2 MAC-VRF Learning (EVPN Type 2)
-Verifying that EVPN MAC/IP routes are correctly advertised and installed in the local MAC tables.
+### 5. L2 MAC-VRF Learning & ESI Synchronization (EVPN Type 2)
+Verifying that MAC addresses are learned locally and synchronized across the ToR pair via EVPN MAC/IP routes.
+
 ```bash
 # On leaf1
 show network-instance vlan10 bridge-table mac-table all
+
 # On leaf2
 show network-instance vlan10 bridge-table mac-table all
 ```
+
 ![EVPN MAC Leaf1](TestImgs/evpn-mac-leaf1.png)
 ![EVPN MAC Leaf2](TestImgs/evpn-mac-leaf2.png)
 
-Both leafs dynamically learned the remote endpoints via EVPN `vxlan1` interfaces and local endpoints via the multihomed `lag1`, effectively synchronizing the L2 broadcast domains.
+Because the servers are dual-homed, both leafs dynamically learn the server endpoints locally via the multihomed `lag` interfaces. EVPN Type 2 routes ensure these MACs are successfully synchronized between the leafs, enabling proper All-Active forwarding and aliasing.
 
 ### 6. L3 IP-VRF Routing (Asymmetric IRB)
 Validating the L3 routing tables for the tenant VRF to ensure Inter-VLAN routing is possible.
@@ -130,7 +136,7 @@ All Ethernet Segments (`ES-SRV1` to `ES-SRV4`) and their respective LACP port-ch
 ## Phase 3: Application Layer & Failover (Servers)
 The final validation focuses on end-to-end dataplane reachability and High Availability.
 
-### 9. Intra-VLAN & Inter-VLAN Reachability
+### 9. Intra-VLAN & Inter-VLAN Reachability (Local Forwarding)
 Testing local L2 bridging (same subnet) and local L3 routing (different subnets) across the multihomed servers.
 
 ```bash
@@ -140,10 +146,11 @@ docker exec -it clab-pro-evpn-srv1 ping -c 4 192.168.10.3
 # 2. Inter-VLAN: srv1 (VLAN 10) to srv4 (VLAN 20)
 docker exec -it clab-pro-evpn-srv1 ping -c 4 192.168.20.4
 ```
+
 ![Intra VLAN Ping](TestImgs/intra-vlan-ping.png)
 ![Inter VLAN Ping](TestImgs/inter-vlan-ping.png)
 
-All Ethernet Segments (`ES-SRV1` to `ES-SRV4`) and their respective LACP port-channels (`lag1` to `lag4`) are operational in `all-active` mode. This ensures loop-free, active-active load balancing for all dual-homed servers without relying on STP.
+ICMP Echo replies are 100% successful for both tests. Due to our All-Active multihoming design, this proves that the ingress leaf successfully performs **Local Switching** (for Intra-VLAN) and **Local Routing via Asymmetric IRB** (for Inter-VLAN) without needing to trombone the unicast traffic across the VXLAN tunnels.
 
 ### 10. Sub-second Failover Test (0% Packet Loss)
 Simulating a physical link failure on a dual-homed server to validate the ESI failover mechanism.
