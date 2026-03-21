@@ -46,7 +46,7 @@ Data forwarding over the IP core is designed around **VXLAN** encapsulation, but
 * **L2 Virtualization (MAC-VRF):** Segmented into `vlan10` and `vlan20`.
 * **L3 Routing (IP-VRF & Asymmetric IRB):** We implemented Asymmetric IRB using `ip-vrf-1`. To facilitate seamless mobility and default routing, we configured **Anycast Gateways** (`192.168.10.254` for VLAN 10 and `192.168.20.254` for VLAN 20) identically across the leafs.
 * **Traffic Flow Optimization (Local Forwarding):** Because all servers are All-Active multihomed to both `leaf1` and `leaf2`, **known unicast traffic** (both Intra-VLAN and Inter-VLAN) does not need to traverse the spine. It is handled entirely via **Local Switching** and **Local Routing** directly at the ingress leaf.
-* **The Role of VXLAN Tunnels:** The established VXLAN tunnels to the Spines/Leafs are fully operational and are actively used for **BUM (Broadcast, Unknown Unicast, Multicast) traffic** (for ex : ARP resolution), as well as providing an immediate backup transit path in the event of local server link failures.
+* **The Role of VXLAN Tunnels:** The established VXLAN tunnels to the Spines/Leafs are fully operational and are actively used for **BUM (Broadcast, Unknown Unicast, Multicast) traffic** (ex: ARP resolution), as well as providing an immediate backup transit path in the event of local server link failures.
 
 ## 7. All-Active Multihoming (EVPN ESI)
 Servers are connected to both leafs using **LACP (802.3ad) port-channels**. 
