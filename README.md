@@ -1,10 +1,10 @@
 # EVPN-VXLAN-Datacenter-Nokia-SRL
-# 🌐 Enterprise Datacenter Fabric: EVPN-VXLAN Architecture & L2/L3 Services (based on Nokia SRL v25)
+# 🌐 Enterprise Datacenter Fabric: Highly Available EVPN-VXLAN Top-of-Rack (ToR) Pair
 
-## 1. Project Overview
-This project demonstrates the design, deployment, and verification of a modern, highly available Datacenter Fabric using **Nokia SR Linux (SRL v25)**. 
+# 1. Project Overview
+This project demonstrates the design, deployment, and verification of a **Highly Available EVPN-VXLAN Top-of-Rack (ToR) Pair** using **Nokia SR Linux (SRL v25)**. It serves as the resilient Edge building block for a modern enterprise datacenter fabric. 
 
-The architecture is built on a robust **OSPFv2 underlay** and an **iBGP EVPN/VXLAN overlay**, providing seamless Layer 2 and Layer 3 virtualization via **Asymmetric IRB**. As part of a complete, production-ready fabric design, we also integrated **EVPN All-Active Multihoming (ESI)** at the access layer to optimize link utilization and ensure fast failover, effectively eliminating the need for legacy STP.
+The architecture is built on a robust **OSPFv2 underlay** and an **iBGP EVPN/VXLAN overlay**, providing seamless Layer 2 and Layer 3 virtualization via **Asymmetric IRB**. By integrating **EVPN All-Active Multihoming (ESI)** at the access layer, we ensure zero-downtime server connectivity, optimize link utilization (active-active load balancing), and effectively eliminate the need for legacy STP.
 
 ## 2. Lab Environment & Prerequisites
 This deployment was tested on a cloud-based environment to handle multiple Nokia SRL instances smoothly.
@@ -41,10 +41,12 @@ The control plane is driven by **MP-iBGP** with the EVPN address family:
 * The EVPN control plane handles endpoint discovery natively using **EVPN Type 2 (MAC/IP)** routes.
 
 ## 6. Dataplane & Tenancy (VXLAN & Asymmetric IRB)
-Data forwarding over the IP core is encapsulated in **VXLAN** tunnels.
+Data forwarding over the IP core is designed around **VXLAN** encapsulation, but its behavior is highly optimized in this topology due to our All-Active multihoming design:
+
 * **L2 Virtualization (MAC-VRF):** Segmented into `vlan10` and `vlan20`.
-* **L3 Routing (IP-VRF & Asymmetric IRB):** We implemented Asymmetric IRB using `ip-vrf-1`. Routing occurs at the ingress leaf, and traffic is bridged across the VXLAN tunnel to the egress leaf.
-* **Anycast Gateway:** Hosts share the same Default Gateway IP configured on the `irb1` subinterfaces (`192.168.10.254` for VLAN 10 and `192.168.20.254` for VLAN 20).
+* **L3 Routing (IP-VRF & Asymmetric IRB):** We implemented Asymmetric IRB using `ip-vrf-1`. To facilitate seamless mobility and default routing, we configured **Anycast Gateways** (`192.168.10.254` for VLAN 10 and `192.168.20.254` for VLAN 20) identically across the leafs.
+* **Traffic Flow Optimization (Local Forwarding):** Because all servers are All-Active multihomed to both `leaf1` and `leaf2`, **known unicast traffic** (both Intra-VLAN and Inter-VLAN) does not need to traverse the spine. It is handled entirely via **Local Switching** and **Local Routing** directly at the ingress leaf.
+* **The Role of VXLAN Tunnels:** The established VXLAN tunnels to the Spines/Leafs are fully operational and are actively used for **BUM (Broadcast, Unknown Unicast, Multicast) traffic** (for ex : ARP resolution), as well as providing an immediate backup transit path in the event of local server link failures.
 
 ## 7. All-Active Multihoming (EVPN ESI)
 Servers are connected to both leafs using **LACP (802.3ad) port-channels**. 
